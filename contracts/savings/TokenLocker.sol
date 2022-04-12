@@ -5,6 +5,7 @@ import { ISavingsContractV3 } from "../interfaces/ISavingsContract.sol";
 import "../interfaces/ITokenLocker.sol";
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
@@ -16,6 +17,7 @@ import { StableMath } from "../shared/StableMath.sol";
 contract TokenLocker is
     ITokenLocker,
     ERC721,
+    ERC721Enumerable,
     Ownable,
     ReentrancyGuard
 {
@@ -151,9 +153,7 @@ contract TokenLocker is
         delete lockerMaturity[_lockerId];
 
         // Burn Locker NFT
-        // TODO- not working to be checked later - send to savingsContract
-        //_burn(_lockerId);
-        transferFrom(msg.sender, address(savingsContract), _lockerId);
+        _burn(_lockerId);
 
         return totalPayout;
     }
@@ -220,5 +220,22 @@ contract TokenLocker is
 
     function totalLockersCreated() public view returns (uint256) {
         return _lockerIdCounter.current();
+    }
+
+    // The following functions are overrides required by Solidity.
+    function _beforeTokenTransfer(address from, address to, uint256 tokenId)
+        internal
+        override(ERC721, ERC721Enumerable)
+    {
+        super._beforeTokenTransfer(from, to, tokenId);
+    }
+    
+    function supportsInterface(bytes4 interfaceId)
+        public
+        view
+        override(ERC721, ERC721Enumerable)
+        returns (bool)
+    {
+        return super.supportsInterface(interfaceId);
     }
 }

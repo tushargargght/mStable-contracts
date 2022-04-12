@@ -277,8 +277,7 @@ describe("TokenLocker", async () => {
             expect(dataAfter.lockerData.lockerCollateral).eq(ZERO)
             expect(dataAfter.lockerData.lockerCredits).eq(ZERO)
             expect(dataAfter.lockerData.lockerMaturity).eq(ZERO)
-            // TODO - burn mechanism not working to be checked later
-            //expect(await tokenLocker.ownerOf(0)).eq(ZERO_ADDRESS)
+            expect(await tokenLocker.balanceOf(sa.default.address)).eq(ZERO)
         })
         it("should allow new owner of Locker to withdraw", async () => {
             await tokenLocker.transferFrom(sa.default.address, bob.address, 0)
